@@ -1,0 +1,27 @@
+autolabeler:
+  - label: 'new-release'
+    branch:
+      - '/^develop$/'
+      - '/^develop-/'
+  - label: 'data-integration'
+    branch:
+      - '/^data[-_]/'
+  - label: 'bug'
+    branch:
+      - '/^bug[-_]/'
+      - '/^bugfix[-_]/'
+      - '/^fix[-_]/'
+  - label: 'hotfix'
+    branch:
+      - '/^hotfix[-_]/'
+      - '/^hot[-_]/'
+  - label: 'feature'
+    branch:
+      - '/^feature[-_]/'
+      - '/^feat[-_]/'
+  - label: 'skip-release-note'
+    branch:
+      - '/update_README\.md/'
+      - '/\bnorn\b/'
+      - '/\bskip[-_]?rn\b/'
+template: '# Labeler'

@@ -1,0 +1,63 @@
+name: SemVer Release Reusable Workflow
+
+# Tag repository using SemVer. Merging in develop tagged the repo with beta version.
+# Merging to main tag with release and create a release with release notes based
+# on the PR titles. The minor version is bumped by default in the main branch.
+# To bump the major or patch version when merging to main, add #major or #patch
+# in the PR title.
+
+# Usage example
+# on:
+#   push:
+#     branches:
+#       - main
+#       - develop
+
+# jobs:
+#   release:
+#     uses: swissgeo/.github/.github/workflows/semver.yml@main
+
+on:
+  workflow_call:
+
+jobs:
+  semver-release:
+    name: Release SemVer
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: '10'
+
+    # Details and Docu
+    # https://github.com/geoadmin/github-tag-action
+    # https://github.com/geoadmin/doc-guidelines/blob/master/GIT_FLOW.md#versioning
+    - name: Bump version and push tag
+      id: tagging
+      uses: geoadmin/github-tag-action@master
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        WITH_V: true
+        DEFAULT_BUMP: minor
+        RELEASE_BRANCHES: main
+        TAG_CONTEXT: repo
+        VERBOSE: true
+
+    - name: Set `New Release` PR title if needed
+      if: ${{ github.base_ref == 'refs/heads/main' }}
+      run: echo "${{ steps.tagging.outputs.new_tag }}"
+
+    # Drafts your next Release notes as Pull Requests are merged into "main"
+    - name: Create Release with Release Notes
+      uses: release-drafter/release-drafter@v6
+      # Do not generate release for beta release tagged on develop branch.
+      if: ${{ github.ref == 'refs/heads/main' }}
+      with:
+        config-name: release-drafter-config.yml
+        disable-autolabeler: true
+        publish: true
+        tag: ${{ steps.tagging.outputs.new_tag }}
+        version: ${{ steps.tagging.outputs.new_tag }}
+        name: ${{ steps.tagging.outputs.new_tag }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
