@@ -1,0 +1,8 @@
+{
+    "name": "SemVer Workflow",
+    "description": "SemVer versioning and release workflow template for Swissgeo project.",
+    "iconName": "swissgeo-logo",
+    "categories": [
+        "JavaScript", "TypeScript", "Python"
+    ]
+}
