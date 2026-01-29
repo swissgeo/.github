@@ -1,0 +1,56 @@
+name: Update AWS Amplify PR Preview Link
+
+# TODO
+
+# NOTE: this workflow only works for github pull_request trigger
+
+# Usage example:
+# on:
+#   pull_request:
+#     types:
+#       - opened
+#       - reopened
+#       - synchronize
+
+on:
+  workflow_call:
+    inputs:
+      preview-domain:
+        required: true
+        type: string
+
+permissions:
+  pull-requests: write
+  contents: read
+
+jobs:
+  update-preview-comment:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Update Amplify PR comment with custom domain
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.number }}
+          PREVIEW_DOMAIN: ${{ inputs.preview-domain}}
+        run: |
+          # Get the amplify comment
+          comment=$(\
+            gh api --method GET "/repos/${{ github.repository }}/issues/${PR_NUMBER}/comments" \
+                   --jq '.[] | select(.performed_via_github_app.slug == "aws-amplify-eu-central-1")' \
+          )
+
+          comment_id=$(echo "${comment}" | jq -r '.id')
+          comment_body=$(echo "${comment}" | jq -r '.body')
+
+          # Update the body text
+          comment_body=$(\
+            echo ${comment_body} | \
+            sed 's|\(https://pr-[0-9]\+\).\+\.amplifyapp\.com|\1.'${PREVIEW_DOMAIN}'|g' \
+          )
+
+          # Update the comment
+          echo comment_body" | \
+            gh api --method PATCH \
+              "/repos/${{ github.repository }}/issues/${PR_NUMBER}/comments/${comment_id}" \
+              -f 'body=@-'
