@@ -8,7 +8,7 @@ Add this to your repository's `renovate.json`:
 
 ```json
 {
-  "extends": ["github>swissgeo/.github:renovate-preset/default.json5"]
+  "extends": ["github>swissgeo/.github:renovate-preset"]
 }
 ```
 
@@ -16,6 +16,6 @@ To extend from a specific branch, use the `#` syntax:
 
 ```json
 {
-  "extends": ["github>swissgeo/.github:renovate-preset/default.json5#feat_GPS-431_renovate_preset"]
+  "extends": ["github>swissgeo/.github:renovate-preset"]
 }
 ```
