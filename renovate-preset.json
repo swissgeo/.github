@@ -6,6 +6,6 @@
     // https://docs.renovatebot.com/presets-group/#groupallnonmajor
     "group:allNonMajor",
     // https://docs.renovatebot.com/presets-default/#prconcurrentlimit10
-    ":prConcurrentLimit10",
+    ":prConcurrentLimit10"
   ]
 }
