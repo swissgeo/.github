@@ -1,0 +1,105 @@
+name: Update AWS Amplify PR Preview Link
+
+# Use this workflow to update the default amplify PR preview link domain to a custom domain.
+# This workflow will search for all amplify app comments in the PR and updates the last
+# comment to a given subdomain with int.sgdi.tech or dev.sgdi.tech depending on the base branch.
+# All other extra amplify comments are removed.
+
+# NOTE: this workflow only works for github issue_comment trigger
+
+# Usage example:
+# ==============
+# name: on-pr-issue-comment
+#
+# on:
+#   issue_comment:
+#     # issue comment event is triggered on both PR and issue comment, but not on pr code review comment
+#     types:
+#       - created
+#       - edited
+#
+# jobs:
+#   pr-preview-link-edit:
+#     uses: swissgeo/.github/.github/workflows/amplify-pr-preview-link.yml@develop
+#     with:
+#       preview-sub-domain: YOUR_SUB_DOMAIN
+
+on:
+  workflow_call:
+    inputs:
+      # Preview sub domain to prefixed to int.sgdi.tech or dev.sgdi.tech depending on the base branch
+      preview-sub-domain:
+        required: true
+        type: string
+
+
+jobs:
+  update-pr-preview-comment:
+    # Only run the job for pull requests comment, ignore issues comment
+    if: ${{ github.event.issue.pull_request }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Update Amplify PR comment with custom domain
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.issue.number }}
+          PREVIEW_SUB_DOMAIN: ${{ inputs.preview-sub-domain}}
+          REPO: ${{ github.repository }}
+        run: |
+          # Get the amplify comment$
+          # Note if we found more than one comment we select the last one
+          comments=$( \
+              gh api --method GET "/repos/${REPO}/issues/${PR_NUMBER}/comments" \
+                    --jq '.[] | select(.performed_via_github_app.slug == "aws-amplify-eu-central-1")' \
+          )
+          # Get the last comment to edit
+          comment=$(printf "%s" "${comments}" | jq -s '.[-1]')
+
+          comment_id=$(printf "%s" "${comment}" | jq -r '.id')
+          comment_body=$(printf "%s" "${comment}" | jq -r '.body')
+          echo "Amplify comment found: id=${comment_id}"
+          echo "-------------------------------"
+          echo "${comment_body}"
+          echo "-------------------------------"
+
+          # Get PR base branch
+          pr_base_branch=$(\
+              gh api --method GET "/repos/${REPO}/pulls/${PR_NUMBER}" \
+                      --jq '.base.ref' \
+          )
+          echo "PR ${PR_NUMBER} base branch: ${pr_base_branch}"
+
+          # Set preview domain
+          if [[ "${pr_base_branch}" == "main" ]]; then
+              preview_domain="${PREVIEW_SUB_DOMAIN}.int.sgdi.tech"
+          else
+              preview_domain="${PREVIEW_SUB_DOMAIN}.dev.sgdi.tech"
+          fi
+          echo "Preview domain: ${preview_domain}"
+
+          # Update the body text
+          comment_body=$(\
+              echo -n "${comment_body}" | \
+              sed 's|\(https://pr-[0-9]\+\).\+\.amplifyapp\.com|\1.'"${preview_domain}"'|g' \
+          )
+          echo "Updated comment body to"
+          echo "-------------------------------"
+          echo "${comment_body}"
+          echo "-------------------------------"
+
+          # Update the comment
+          echo -n "${comment_body}" | \
+              gh api "/repos/${REPO}/issues/comments/${comment_id}" \
+                  --method PATCH \
+                  -F 'body=@-'
+          echo "Amplify comment updated"
+
+          # Remove all extra comments, due to multiple amplify run.
+          # Amplify create a new comment on each deployment because we modified its original comment
+          # therefore remove all extra amplify comments
+          printf "%s" "${comments}" | jq -sc '.[0:-1][]' | while IFS= read -r comment; do
+            comment_id=$(printf "%s" "${comment}" | jq -r '.id')
+            echo "deleting comment ${comment_id}"
+            gh api "/repos/${REPO}/issues/comments/${comment_id}" --method DELETE
+          done
