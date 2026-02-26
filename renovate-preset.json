@@ -8,7 +8,6 @@
     // https://docs.renovatebot.com/presets-default/#prconcurrentlimit10
     ":prConcurrentLimit10"
   ],
-  "schedule": [
-    "sunday"
-  ]
+  "schedule": ["sunday"],
+  "minimumReleaseAge": "7d"
 }
