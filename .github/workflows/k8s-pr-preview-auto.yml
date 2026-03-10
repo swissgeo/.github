@@ -1,0 +1,84 @@
+name: Add PR preview link - auto
+
+# Use this workflow to add a PR preview label and link as PR comment.
+#
+# It automatically add a pr-preview label to any PR being opened or reopened, this label allow
+# ArgoCD ApplicationSet pull request generator to deploy a preview build.
+# It also add/remove a PR comment with a link to the preview deployment based on the presence of the
+# pr-preview label.
+# NOTE: this workflow only works for github pull_request trigger
+#
+# Usage example:
+# ==============
+# name: on-pr
+#
+# on:
+#   pull_request:
+#     types:
+#       - opened
+#       - reopened
+#       - labeled
+#       - unlabeled
+#
+# jobs:
+#   pr-preview:
+#     uses: swissgeo/.github/.github/workflows/k8s-pr-preview-auto.yml@main
+#     with:
+#       preview-domain: SYSTEM.${{ github.base_ref == 'main' && 'int' || 'dev' }}.sgdi.tech
+
+on:
+  workflow_call:
+    inputs:
+      # Preview domain to prefixed to depending on the base branch (e.g www.int.sgdi.tech or www.dev.sgdi.tech)
+      preview-domain:
+        required: true
+        type: string
+
+
+jobs:
+  pr-preview-label:
+    name: Add PR preview label
+    runs-on: ubuntu-latest
+    if: ${{ github.event.action == 'opened' || github.event.action == 'reopened' }}
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      PR_NUMBER: ${{ github.event.number }}
+      REPO: ${{ github.repository }}
+
+    steps:
+      - name: Add pr-preview label
+        run: |
+          gh pr edit "${PR_NUMBER}" --repo "${REPO}" --add-label pr-preview
+
+  pr-preview-link:
+    name: Add PR preview link
+    runs-on: ubuntu-latest
+    if: ${{
+      github.event.action == 'opened' ||
+      github.event.action == 'reopened' ||
+      (github.event.action == 'labeled' && github.event.label.name == 'pr-preview') }}
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      PR_NUMBER: ${{ github.event.number }}
+      REPO: ${{ github.repository }}
+      PREVIEW_DOMAIN: ${{ inputs.preview-domain}}
+
+    steps:
+      - name: Add PR comment with PR preview link
+        run: |
+          MESSAGE=":mag_right: Preview Link [pr-${PR_NUMBER}.${PREVIEW_DOMAIN}](https://pr-${PR_NUMBER}.${PREVIEW_DOMAIN})"
+          gh pr comment "${PR_NUMBER}" --repo "${REPO}" --edit-last --create-if-none --body "${MESSAGE}"
+
+  rm-pr-preview-link:
+    name: Remove PR preview link
+    runs-on: ubuntu-latest
+    if: ${{ github.event.action == 'unlabeled' && github.event.label.name == 'pr-preview' }}
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      PR_NUMBER: ${{ github.event.number }}
+      REPO: ${{ github.repository }}
+
+    steps:
+      - name: Remove PR comment with PR preview link
+        run: |
+          gh pr comment "${PR_NUMBER}" --repo "${REPO}" --delete-last --yes
