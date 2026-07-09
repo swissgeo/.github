@@ -1,0 +1,78 @@
+name: PR Label Validation Reusable Workflow
+
+# Validate that the PR has exactly one of the required category labels and none of the
+# forbidden labels. This is triggered on label changes so that manually adding or removing
+# a label re-runs the validation.
+
+# NOTES:
+#  - this workflow only works for github pull_request trigger
+#  - Github labels are managed by Terraform, see https://github.com/swissgeo/infra-terraform/blob/main/github/modules/issue-labels/main.tf
+
+# Usage example:
+# on:
+#   pull_request:
+#     types:
+#       - labeled
+#       - unlabeled
+
+on:
+  workflow_call:
+    inputs:
+      required_labels:
+        description: 'JSON array of labels; exactly one must be present on the PR'
+        type: string
+        default: '["bug", "feature", "new-release", "data-integration"]'
+      forbidden_labels:
+        description: 'JSON array of labels that must not be present on the PR'
+        type: string
+        default: '["DO NOT MERGE :bomb:", "WIP :construction:"]'
+
+jobs:
+  pr-labels:
+    name: Validate PR labels
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check required and forbidden labels
+        uses: actions/github-script@v9
+        env:
+          REQUIRED_LABELS: ${{ inputs.required_labels }}
+          FORBIDDEN_LABELS: ${{ inputs.forbidden_labels }}
+        with:
+          script: |
+            // Every PR is also an issue in GitHub's API, so the issues endpoint returns PR labels too.
+            const { data: issueLabels } = await github.rest.issues.listLabelsOnIssue({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+            const labels = issueLabels.map((label) => label.name);
+            core.info(`PR labels: ${JSON.stringify(labels)}`);
+
+            const forbiddenLabels = JSON.parse(process.env.FORBIDDEN_LABELS);
+            for (const label of forbiddenLabels) {
+              if (labels.includes(label)) {
+                core.setFailed(`PR has forbidden label: ${label}`);
+                return;
+              }
+            }
+
+            if (labels.includes("skip-relase-note")) {
+              core.info(`PR has skip-release-note label`);
+              return;
+            }
+
+            // Exactly one of these category labels is required (other labels are allowed alongside it)
+            const requiredLabels = JSON.parse(process.env.REQUIRED_LABELS);
+            const matched = requiredLabels.filter((label) => labels.includes(label));
+
+            if (matched.length === 0) {
+              core.setFailed(`PR must have one of the following labels: ${requiredLabels.join(", ")}`);
+              return;
+            }
+
+            if (matched.length > 1) {
+              core.setFailed(`PR must have only one of the following labels, found: ${matched.join(", ")}`);
+              return;
+            }
+
+            core.info(`PR label check passed: ${matched.join(", ")}`);

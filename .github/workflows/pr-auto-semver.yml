@@ -139,26 +139,3 @@ jobs:
 
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  branch-name:
-    name: Validate branch name pattern
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check branch name pattern
-        # For the pattern see also ../release-drafter-labeler-config.yml
-        env:
-          BRANCH: ${{ github.head_ref }}
-        run: |
-          if [[ "${BRANCH}" == "develop" ]]; then
-            echo "Branch name is 'develop', skipping pattern check"
-            exit 0
-          fi
-          if [[ "${BRANCH}" == "main" ]]; then
-            echo "Branch name is 'main', skipping pattern check"
-            exit 0
-          fi
-          expected_pattern="^(feature|feat|bugfix|bug|hotfix|hot|data|norn|skip-rn)[/_-].+$"
-          if [[ ! "${BRANCH}" =~ ${expected_pattern} ]]; then
-            echo "Invalid branch name: ${BRANCH}, expected pattern: ${expected_pattern}"
-            exit 1
-          fi
