@@ -8,8 +8,12 @@ name: PR Auto Label and SemVer Release Title Reusable Workflow
 #
 # For hotfix (hotfix-* -> main PR) the title is set to `<next-version> - <original-title> - <bump-type>`
 #
-# Finally add a Label to the PR based on HEAD branch name. These labels are then used to categorize
+# Validate the PR content: title pattern, description not empty and commit message patterns.
+#
+# Add a Label to the PR based on HEAD branch name. These labels are then used to categorize
 # the release notes.
+#
+# Check the labels against labels for release not categorization and merge guards
 
 # NOTE: this workflow only works for github pull_request trigger
 
@@ -21,12 +25,14 @@ name: PR Auto Label and SemVer Release Title Reusable Workflow
 #       - reopened
 #       - synchronize
 #       - edited
+#       - labeled
+#       - unlabeled
 
 on:
   workflow_call:
 
 jobs:
-  pr-release-title:
+  release-title:
     name: Set PR title
     runs-on: ubuntu-latest
     if: ${{ github.base_ref == 'main' }}
@@ -34,7 +40,6 @@ jobs:
       PR_TITLE: ${{ github.event.pull_request.title }}
       PR_BODY: ${{ github.event.pull_request.body }}
     steps:
-
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
@@ -127,16 +132,10 @@ jobs:
             --method "PATCH" \
             -f 'title=${{ steps.bump_type.outputs.pr_title }} - #${{ steps.get_tag.outputs.part }}'
 
-  pr-labeler:
-    name: Set PR label
-    runs-on: ubuntu-latest
-    steps:
-      - name: PR Auto Labeler
-        uses: release-drafter/release-drafter@v6
-        with:
-          config-name: release-drafter-labeler-config.yml
-          disable-autolabeler: false
-          disable-releaser: true
+  content:
+    # Do not validate PR content for release PR (develop -> main)
+    if: ${{ !(github.head_ref == 'develop' && github.base_ref == 'main') }}
+    uses: ./.github/workflows/pr-content.yml
 
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  labels:
+    uses: ./.github/workflows/pr-labels.yml

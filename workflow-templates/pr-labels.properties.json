@@ -1,0 +1,8 @@
+{
+    "name": "PR Label Validation Workflow",
+    "description": "PR label validation workflow template for Swissgeo project. This template validates that a PR has exactly one required category label and no forbidden labels, re-checking whenever a label is added or removed.",
+    "iconName": "swissgeo-logo",
+    "categories": [
+        "JavaScript", "TypeScript", "Python"
+    ]
+}
