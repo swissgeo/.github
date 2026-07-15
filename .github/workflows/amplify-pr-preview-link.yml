@@ -24,6 +24,10 @@ name: Update AWS Amplify PR Preview Link
 #     with:
 #       preview-sub-domain: YOUR_SUB_DOMAIN
 
+permissions:
+  issues: write
+  pull-requests: write
+
 on:
   workflow_call:
     inputs:

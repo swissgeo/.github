@@ -16,6 +16,9 @@ name: PR Content Validation Reusable Workflow
 #       - reopened
 #       - edited
 
+permissions:
+  pull-requests: read
+
 on:
   workflow_call:
     inputs:

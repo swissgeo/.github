@@ -23,6 +23,11 @@ name: PR Labels and Content Reusable Workflow for infra repository
 #       - labeled
 #       - unlabeled
 
+permissions:
+  contents: read
+  issues: read
+  pull-requests: write
+
 on:
   workflow_call:
 

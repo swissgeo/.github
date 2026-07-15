@@ -18,6 +18,11 @@ name: PR Label Validation Reusable Workflow
 #       - labeled
 #       - unlabeled
 
+permissions:
+  contents: read
+  issues: read
+  pull-requests: write
+
 on:
   workflow_call:
     inputs:

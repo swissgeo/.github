@@ -17,6 +17,9 @@ name: SemVer Release Reusable Workflow
 #   release:
 #     uses: swissgeo/.github/.github/workflows/semver.yml@main
 
+permissions:
+  contents: write
+
 on:
   workflow_call:
 

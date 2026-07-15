@@ -26,6 +26,10 @@ name: Add PR preview link - auto
 #     with:
 #       preview-domain: SYSTEM.${{ github.base_ref == 'main' && 'int' || 'dev' }}.sgdi.tech
 
+permissions:
+  issues: write
+  pull-requests: write
+
 on:
   workflow_call:
     inputs:

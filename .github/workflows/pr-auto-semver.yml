@@ -28,6 +28,11 @@ name: PR Auto Label and SemVer Release Title Reusable Workflow
 #       - labeled
 #       - unlabeled
 
+permissions:
+  contents: read
+  issues: read
+  pull-requests: write
+
 on:
   workflow_call:
 
@@ -39,6 +44,7 @@ jobs:
     env:
       PR_TITLE: ${{ github.event.pull_request.title }}
       PR_BODY: ${{ github.event.pull_request.body }}
+      HEAD_REF: ${{ github.head_ref }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -53,8 +59,8 @@ jobs:
           cd "${GITHUB_WORKSPACE}"
           git config user.email "github@swisstopo.ch"
           git config user.name "Github PR Auto Title Workflow"
-          git fetch origin ${{ github.head_ref }}:${{ github.head_ref }}
-          git merge ${{ github.head_ref }} --no-ff -m "${PR_TITLE}\n\n${PR_BODY}"
+          git fetch origin "${HEAD_REF}:${HEAD_REF}"
+          git merge "${HEAD_REF}" --no-ff -m "${PR_TITLE}\n\n${PR_BODY}"
 
       - name: Get Default Bump Type from PR and get PR Title
         id: bump_type
@@ -62,7 +68,7 @@ jobs:
           bump_type=minor
 
           # Set default bump type for hotfixes
-          case "${{ github.head_ref }}" in
+          case "${HEAD_REF}" in
             hotfix* | bugfix* | bug* | fix* | dependabot/*)
               bump_type=patch
               echo "Hotfix branch detected set default bump to ${bump_type}"
