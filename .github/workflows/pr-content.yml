@@ -38,6 +38,15 @@ jobs:
           JIRA_PROJECT_KEYS: ${{ inputs.jira_project_keys }}
         with:
           script: |
+            // Example of PR titles:
+            //   ✅ GPS-123: Add feature X
+            //   ❌ GPS-123 Add feature X
+            //   ❌ GPS-123:
+            //   ✅ CHORE: Update library Y
+            //   ❌ chore: Update library Y
+            //   ❌ no-issue: Update library Y
+            //   ❌ GPS-123: Add feature X (wip)
+
             const title = context.payload.pull_request.title;
             const jiraProjectKeys = JSON.parse(process.env.JIRA_PROJECT_KEYS);
             const titlePattern = new RegExp(`^(((${jiraProjectKeys.join("|")})-\\d+)+|CHORE): .+$`);
