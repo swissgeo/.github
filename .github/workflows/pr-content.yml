@@ -30,7 +30,7 @@ on:
 jobs:
   title:
     name: Validate PR title
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     steps:
       - name: Check PR title pattern
         uses: actions/github-script@v9
@@ -65,7 +65,7 @@ jobs:
 
   description:
     name: Validate PR description
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     steps:
       - name: Check PR description is not empty
         uses: actions/github-script@v9
@@ -82,7 +82,7 @@ jobs:
 
   commits:
     name: Validate commit messages
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     steps:
       - name: Check all commit messages pattern
         uses: actions/github-script@v9

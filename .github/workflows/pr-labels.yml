@@ -43,7 +43,7 @@ jobs:
   labeler:
     name: Set PR label
     if: ${{ github.event.pull_request.state == 'open' }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     steps:
       - name: PR Auto Labeler
         uses: release-drafter/release-drafter@v6
@@ -59,7 +59,7 @@ jobs:
     name: Validate PR labels
     # Wait for labeler so freshly auto-assigned labels are visible to the check.
     needs: labeler
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     steps:
       - name: Check PR labels
         uses: actions/github-script@v9

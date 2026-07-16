@@ -41,7 +41,7 @@ jobs:
   update-pr-preview-comment:
     # Only run the job for pull requests comment, ignore issues comment
     if: ${{ github.event.issue.pull_request }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
 
     steps:
       - name: Update Amplify PR comment with custom domain

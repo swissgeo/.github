@@ -39,6 +39,8 @@ on:
 jobs:
   release-title:
     name: Set PR title
+    # Here below we cannot use ubuntu-slim because geoadmin/github-tag-action requires to run docker
+    # and ubuntu-slim does not support to run docker in docker !
     runs-on: ubuntu-latest
     if: ${{ github.base_ref == 'main' }}
     env:
