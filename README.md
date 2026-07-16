@@ -16,7 +16,7 @@ This repository contains the Swissgeo workflows templates and reusable workflows
 
 ### Reusable workflows
 
-Reusable workflow are in the [.github/workflows](.github/workflows/), they are managed by PP-BGDI.
+Reusable workflow are in the [.github/workflows](.github/workflows/).
 
 > [!warning]
 > Changing reusable workflows affect all repositories
@@ -35,7 +35,7 @@ uses a default amplify domain. This workflow update this comment with our custom
 #### PR Auto Semver
 
 [pr-auto-semver.yml](.github/workflows/pr-auto-semver.yml) workflow to set the PR label based on 
-head branch prefix. It also automatically set the PR title for new release PR (develop -> master)
+head branch prefix. It also automatically set the PR title for new release PR (develop -> main)
 
 #### Semver Release
 
