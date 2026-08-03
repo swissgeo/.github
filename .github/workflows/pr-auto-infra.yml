@@ -33,9 +33,7 @@ on:
 
 jobs:
   content:
-    name: Validate PR content
     uses: ./.github/workflows/pr-content.yml
 
   labels:
-    name: Set and validate PR labels
     uses: ./.github/workflows/pr-labels.yml
