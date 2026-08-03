@@ -9,7 +9,7 @@ Add this file to the root of your repository `renovate.json`:
     "$schema": "https://docs.renovatebot.com/renovate-schema.json",
     "extends": ["github>swissgeo/.github:renovate-preset"],
     "reviewers": ["keetraxx"],
-    "baseBranchPatterns": ["master"]
+    "baseBranchPatterns": ["main"]
 }
 ```
 
@@ -41,4 +41,3 @@ Example `CODEOWNERS` file (place it in `.github/CODEOWNERS`):
 ```
 
 You can use individual GitHub usernames (`@smith`) and/or organization teams (`@swissgeo/devops-team`). Organization teams are managed in your GitHub organization under **Settings > Teams**.
-

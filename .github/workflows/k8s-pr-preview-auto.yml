@@ -26,6 +26,10 @@ name: Add PR preview link - auto
 #     with:
 #       preview-domain: SYSTEM.${{ github.base_ref == 'main' && 'int' || 'dev' }}.sgdi.tech
 
+permissions:
+  issues: write
+  pull-requests: write
+
 on:
   workflow_call:
     inputs:
@@ -38,7 +42,7 @@ on:
 jobs:
   pr-preview-label:
     name: Add PR preview label
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     if: ${{ github.event.action == 'opened' || github.event.action == 'reopened' }}
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -52,7 +56,7 @@ jobs:
 
   pr-preview-link:
     name: Add PR preview link
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     if: ${{
       github.event.action == 'opened' ||
       github.event.action == 'reopened' ||
@@ -71,7 +75,7 @@ jobs:
 
   rm-pr-preview-link:
     name: Remove PR preview link
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     if: ${{ github.event.action == 'unlabeled' && github.event.label.name == 'pr-preview' }}
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
