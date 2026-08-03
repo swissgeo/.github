@@ -46,7 +46,7 @@ jobs:
     runs-on: ubuntu-slim
     steps:
       - name: PR Auto Labeler
-        uses: release-drafter/release-drafter@v6
+        uses: release-drafter/release-drafter@v7
         with:
           config-name: release-drafter-labeler-config.yml
           disable-autolabeler: false
