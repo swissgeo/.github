@@ -8,5 +8,15 @@
     // https://docs.renovatebot.com/presets-default/#prconcurrentlimit10
     ":prConcurrentLimit10"
   ],
-  "minimumReleaseAge": "2d"
+  "minimumReleaseAge": "2d",
+  // config:recommended enables semantic commits in "auto" mode, which would
+  // produce "chore(deps): ..." in repos that already use semantic commits and
+  // would override commitMessagePrefix. Disable it so the prefix below applies
+  // consistently in every repo extending this preset.
+  // https://docs.renovatebot.com/configuration-options/#semanticcommits
+  "semanticCommits": "disabled",
+  // Applies to both the commit message and the PR title (the PR title is
+  // derived from the commit message), matching the "CHORE: ..." convention.
+  // https://docs.renovatebot.com/configuration-options/#commitmessageprefix
+  "commitMessagePrefix": "CHORE:"
 }
