@@ -1,7 +1,7 @@
 name: PR Content Validation Reusable Workflow
 
 # Validate the PR content as follow:
-# - PR title matches the pattern ^(((<jira_project_keys>)-\d+)+|CHORE): .+$ and does not contain "wip"
+# - PR title matches the pattern ^(((<jira_project_keys>)-\d+)+|chore): .+$ and does not contain "wip"
 # - PR description is not empty
 # - All commit messages match the same pattern as the PR title
 
@@ -42,14 +42,14 @@ jobs:
             //   ✅ GPS-123: Add feature X
             //   ❌ GPS-123 Add feature X
             //   ❌ GPS-123:
-            //   ✅ CHORE: Update library Y
-            //   ❌ chore: Update library Y
+            //   ✅ chore: Update library Y
+            //   ❌ CHORE: Update library Y
             //   ❌ no-issue: Update library Y
             //   ❌ GPS-123: Add feature X (wip)
 
             const title = context.payload.pull_request.title;
             const jiraProjectKeys = JSON.parse(process.env.JIRA_PROJECT_KEYS);
-            const titlePattern = new RegExp(`^(((${jiraProjectKeys.join("|")})-\\d+)+|CHORE): .+$`);
+            const titlePattern = new RegExp(`^(((${jiraProjectKeys.join("|")})-\\d+)+|chore(\\(deps\\))?): .+$`);
 
             if (!titlePattern.test(title)) {
               core.setFailed(`PR title "${title}" does not match the required pattern: ${titlePattern}`);
@@ -99,7 +99,7 @@ jobs:
             }
 
             const jiraProjectKeys = JSON.parse(process.env.JIRA_PROJECT_KEYS);
-            const titlePattern = new RegExp(`^(((${jiraProjectKeys.join("|")})-\\d+)+|CHORE): .+$`);
+            const titlePattern = new RegExp(`^(((${jiraProjectKeys.join("|")})-\\d+)+|chore(\\(deps\\))?): .+$`);
 
             const commits = await github.paginate(github.rest.pulls.listCommits, {
               owner: context.repo.owner,
