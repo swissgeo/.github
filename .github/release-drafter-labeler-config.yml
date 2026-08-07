@@ -24,4 +24,9 @@ autolabeler:
       - '/update_README\.md/'
       - '/\bnorn\b/'
       - '/\bskip[-_]?rn\b/'
+  - label: 'dependencies'
+    branch:
+      - '/^renovate[-_/]/'
+      - '/^dependabot[-_/]/'
+      - '/^dep[-_/]/'
 template: '# Labeler'
