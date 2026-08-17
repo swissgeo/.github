@@ -6,11 +6,11 @@
     // https://docs.renovatebot.com/presets-group/#groupallnonmajor
     "group:allNonMajor",
     // https://docs.renovatebot.com/presets-default/#prconcurrentlimit10
-    ":prConcurrentLimit10"
+    ":prConcurrentLimit10",
+    // override semantic commit type to "chore" for all dependencies
+    // default is "fix" for dependencies, "chore" for devDependencies
+    ":semanticCommitTypeAll(chore)"
   ],
   "minimumReleaseAge": "2d",
-  // config:recommended enables semantic commits in "auto" mode, which
-  // produce "chore(deps): ..." in repos that already use semantic commits
-  // https://docs.renovatebot.com/configuration-options/#semanticcommits
   "semanticCommits": "enabled"
 }
