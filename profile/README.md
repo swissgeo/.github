@@ -1,1 +1,1 @@
-# Welcome to SwissGeo Organization
+# Welcome to SWISSGEO Organization

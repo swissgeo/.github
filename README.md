@@ -12,7 +12,7 @@ This is the special organization main repository
 
 ## Github Workflows
 
-This repository contains the Swissgeo workflows templates and reusable workflows used for the organization's projects.
+This repository contains the SWISSGEO workflows templates and reusable workflows used for the organization's projects.
 
 ### Reusable workflows
 
